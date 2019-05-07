@@ -1,0 +1,41 @@
+name:                Exercises
+version:             0.1.1
+github:              "leyhline/HaskellExercises2019"
+author:              "Thomas Leyh"
+maintainer:          "thomas.leyh@mailbox.org"
+copyright:           "(c) 2019 Thomas Leyh"
+
+extra-source-files:
+- README.md
+
+description:         Solutions to the exercises from Freiburg's Haskell Course in summer 2019.
+
+dependencies:
+- base >= 4.7 && < 5
+
+library:
+  source-dirs: src
+  dependencies:
+  - QuickCheck
+
+executables:
+  Exercises-exe:
+    main:                Main.hs
+    source-dirs:         app
+    ghc-options:
+    - -threaded
+    - -rtsopts
+    - -with-rtsopts=-N
+    dependencies:
+    - Exercises
+
+tests:
+  Exercises-test:
+    main:                Spec.hs
+    source-dirs:         test
+    ghc-options:
+    - -threaded
+    - -rtsopts
+    - -with-rtsopts=-N
+    dependencies:
+    - Exercises
