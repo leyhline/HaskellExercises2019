@@ -7,6 +7,9 @@ import Test.QuickCheck.All
 addOne :: Int -> Int
 addOne x = x + 1
 
+smallerTen :: Int -> Bool
+smallerTen x = x < 10
+
 head' :: [a] -> a
 head' (x:xs) = x
 
@@ -74,19 +77,53 @@ intersperse' elem (x:y:xs) = x : elem : intersperse' elem (y:xs)
 
 prop_LikeBuiltinIntersperse elem list = intersperse' elem list == intersperse elem list
 
--- concat' :: Foldable t => t [a] -> [a]
+concat' :: [[a]] -> [a]
+concat' [] = []
+concat' (x:xs) = x +++ concat' xs
 
--- zipWith' :: (a -> b -> c) -> [a] -> [b] -> [c]
+prop_LikeBuiltinConcat x = concat' x == concat x
 
--- repeat' :: a -> [a]
+zipWith' :: (a -> b -> c) -> [a] -> [b] -> [c]
+zipWith' f [] y = []
+zipWith' f x [] = []
+zipWith' f (x:xs) (y:ys) = f x y : zipWith f xs ys
 
--- and' :: Foldable t => t Bool -> Bool
+prop_LikeBuiltinZipWith x y = zipWith' (+) x y == zipWith (+) x y
 
--- takeWhile' :: (a -> Bool) -> [a] -> [a]
+repeat' :: a -> [a]
+repeat' x = x : repeat' x
 
--- dropWhile' :: (a -> Bool) -> [a] -> [a]
+prop_LikeBuiltinRepeat x = take 10 (repeat' x) == take 10 (repeat x)
 
---maximum' :: forall a. (Foldable t, Ord a) => t a -> a
+and' :: [Bool] -> Bool
+and' [] = True
+and' (x:xs) = x && and' xs
+
+prop_LikeBuiltinAnd x = and' x == and x
+
+takeWhile' :: (a -> Bool) -> [a] -> [a]
+takeWhile' f [] = []
+takeWhile' f (x:xs) = if f x
+    then x : takeWhile' f xs
+    else []
+
+prop_LikeBuiltinTakeWhile x = takeWhile' smallerTen x == takeWhile smallerTen x
+
+dropWhile' :: (a -> Bool) -> [a] -> [a]
+dropWhile' f [] = []
+dropWhile' f (x:xs) = if f x
+    then dropWhile' f xs
+    else x:xs
+
+prop_LikeBuiltinDropWhile x = dropWhile' smallerTen x == dropWhile smallerTen x
+
+maximum' :: Ord a => [a] -> a
+maximum' [x] = x
+maximum' (x:y:xs) = if x > y
+    then maximum' (x:xs)
+    else maximum' (y:xs)
+
+prop_LikeBuiltinMaximum x = maximum' (x++[0]) == maximum (x++[0])
 
 return []
 runTests :: IO Bool
