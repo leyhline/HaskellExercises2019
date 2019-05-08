@@ -86,7 +86,7 @@ prop_LikeBuiltinConcat x = concat' x == concat x
 zipWith' :: (a -> b -> c) -> [a] -> [b] -> [c]
 zipWith' f [] y = []
 zipWith' f x [] = []
-zipWith' f (x:xs) (y:ys) = f x y : zipWith f xs ys
+zipWith' f (x:xs) (y:ys) = f x y : zipWith' f xs ys
 
 prop_LikeBuiltinZipWith x y = zipWith' (+) x y == zipWith (+) x y
 
