@@ -1,5 +1,5 @@
 import System.Exit
-import Sheet1.Ex1
+import Sheet1.Ex2
 
 main :: IO ()
 main = do
