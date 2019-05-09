@@ -4,7 +4,7 @@ module Sheet1.Ex2 where
 import Data.Char
 import Test.QuickCheck.All
 
-initialStack = [0,0..]
+initialStack = [0,0..] :: [Int]
 
 push :: Int -> [Int] -> [Int]
 push n stack = n:stack
@@ -68,6 +68,14 @@ isDigits :: String -> Bool
 isDigits = all isDigit
 
 prop_RandomInputIsNoop commands stack = readCommand commands stack == stack
+
+repl :: [Int] -> IO()
+repl stack = do
+    putStr "> "
+    command <- getLine
+    stack <- return (processCommand command stack)
+    print $ take 10 stack
+    repl stack
 
 return []
 runTests :: IO Bool
