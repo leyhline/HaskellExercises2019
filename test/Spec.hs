@@ -1,9 +1,16 @@
 import System.Exit
-import Sheet1.Ex3
+import Sheet1.Ex1 as Sheet1Ex1
+import Sheet1.Ex2 as Sheet1Ex2
+import Sheet1.Ex3 as Sheet1Ex3
+import Sheet2.Ex1 as Sheet2Ex1
 
 main :: IO ()
 main = do
-    good <- and <$> sequence [runTests]
+    good <- and <$> sequence [
+        Sheet1Ex1.runTests,
+        Sheet1Ex2.runTests,
+        Sheet1Ex3.runTests,
+        Sheet2Ex1.runTests]
     if good
         then exitSuccess
         else exitFailure
