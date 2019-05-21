@@ -1,7 +1,5 @@
 module Sheet2.Ex4 where
 
-import Data.List
-
 type Title = String
 type Artist = String
 type Duration = Int
