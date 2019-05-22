@@ -14,6 +14,7 @@ buildUndupList (unduplicated, current:remaining)
         then buildUndupList (unduplicated, remaining)
         else buildUndupList (current:unduplicated, remaining)
 
+prop_CompareWithNub :: [Int] -> Bool
 prop_CompareWithNub x = undup x == nub x
 
 return []

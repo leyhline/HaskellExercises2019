@@ -6,9 +6,6 @@ data Row = Row Field Field Field deriving Show
 type Col = Row
 type Diag = Row
 
-trd :: (a, b, c) -> c
-trd (x, y, z) = z
-
 getRows :: Grid -> (Row, Row, Row)
 getRows (Grid x1 x2 x3 y1 y2 y3 z1 z2 z3) = (Row x1 x2 x3, Row y1 y2 y3, Row z1 z2 z3)
 
