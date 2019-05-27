@@ -1,5 +1,5 @@
 name:                Exercises
-version:             0.3.2
+version:             0.3.3
 github:              "leyhline/HaskellExercises2019"
 author:              "Thomas Leyh"
 maintainer:          "thomas.leyh@mailbox.org"
@@ -17,6 +17,7 @@ library:
   source-dirs: src
   dependencies:
   - QuickCheck
+  - text
   - svg-builder
 
 executables:
@@ -29,6 +30,7 @@ executables:
     - -with-rtsopts=-N
     dependencies:
     - Exercises
+    - svg-builder
 
 tests:
   Exercises-test:
