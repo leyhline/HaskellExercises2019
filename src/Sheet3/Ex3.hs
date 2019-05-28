@@ -61,8 +61,8 @@ randomHouses nr = do
     someNumbers <- randomNumbers (0.25, 4.0) nr
     return $ Picture $ snd $ mapAccumR (\mov scal -> (mov+scal, scaleAndMoveHorizontal scal mov houseWithRoofWindow)) 0.0 someNumbers
 
-createSvg :: String -> Int -> IO ()
-createSvg filename nrOfHouses = do
+createSvgHouses :: String -> Int -> IO ()
+createSvgHouses  filename nrOfHouses = do
     houses <- randomHouses nrOfHouses
     renderToFile filename (toSvgWithHeader (120 * fromIntegral nrOfHouses) 500 $ scalePic 50 houses)
 
@@ -80,3 +80,21 @@ rot (x, y) degree = (r2*x - r1*y, r1*x + r2*y)
     where
         r1 = sin (degree * pi / 180)
         r2 = cos (degree * pi / 180)
+
+dragon :: Integer -> Picture
+dragon i
+    | i < 0 = error "This won't take negative numbers."
+    | i == 0 = Picture [Line 0 0 0 50]
+    | otherwise = newDragon <> formerDragon
+    where
+        formerDragon = dragon (i-1)
+        c1 = (if even i then x2 else x1) $ head $ getPictureList formerDragon
+        c2 = (if even i then y2 else y1) $ head $ getPictureList formerDragon
+        newDragon = rotatePic (c1, c2) 90 formerDragon
+        
+
+getPictureList :: Picture -> [Picture]
+getPictureList (Picture p) = p
+
+createSvgDragon :: String -> Integer -> IO ()
+createSvgDragon filename i = renderToFile filename (toSvgWithHeader 500 500 $ movePic (100, 100) $ dragon i)

@@ -2,7 +2,7 @@
 
 module Main where
 
-import Sheet3.Ex3(createSvg)
+import Sheet3.Ex3(createSvgHouses)
 
 main :: IO ()
-main = createSvg "output.svg" 15
+main = createSvgHouses "output.svg" 15
