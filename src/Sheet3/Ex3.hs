@@ -101,4 +101,7 @@ mirrorPic (Picture pics) = Picture (reverse $ map mirrorPic pics)
 mirrorPic x = x
 
 createSvgDragon :: String -> Integer -> IO ()
-createSvgDragon filename i = renderToFile filename (toSvgWithHeader 2^(i+2) 2^(i+2) $ movePic (2^i, 2^i) $ dragon i)
+createSvgDragon filename i = renderToFile filename (toSvgWithHeader canvasSize canvasSize $ movePic (movement, movement) $ dragon i)
+    where
+        canvasSize = fromIntegral i * 800.0
+        movement = fromIntegral i * 400.0
