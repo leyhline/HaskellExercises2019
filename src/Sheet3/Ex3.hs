@@ -65,3 +65,15 @@ createSvg :: String -> Int -> IO ()
 createSvg filename nrOfHouses = do
     houses <- randomHouses nrOfHouses
     renderToFile filename (toSvgWithHeader (120 * fromIntegral nrOfHouses) 500 $ scalePic 50 houses)
+
+rotatePic :: (Float, Float) -> Float -> Picture -> Picture
+rotatePic (c1, c2) degree (Line x1 y1 x2 y2) = uncurry (uncurry Line (rot (x1, y1) degree)) (rot (x2, y2) degree)
+rotatePic (c1, c2) degree (Rectangle x y width height) = uncurry Rectangle (rot (x, y) degree) width height
+rotatePic (c1, c2) degree (Circle cx cy r) = uncurry Circle (rot (cx, cy) degree) r
+rotatePic center degree (Picture pics) = Picture (map (rotatePic center degree) pics)
+
+rot :: (Float, Float) -> Float -> (Float, Float)
+rot (x, y) degree = (r2*x - r1*y, r1*x + r2*y)
+    where
+        r1 = sin (degree * pi / 180)
+        r2 = cos (degree * pi / 180)
