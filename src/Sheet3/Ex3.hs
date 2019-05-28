@@ -1,5 +1,7 @@
 module Sheet3.Ex3 where
 
+import Data.List
+import System.Random
 import Graphics.Svg
 import qualified Data.Text as T
 
@@ -47,3 +49,19 @@ scalePic s (Line x1 y1 x2 y2) = Line (s*x1) (s*y1) (s*x2) (s*y2)
 scalePic s (Rectangle x y width height) = Rectangle (s*x) (s*y) (s*width) (s*height)
 scalePic s (Circle cx cy r) = Circle (s*cx) (s*cy) (s*r)
 scalePic s (Picture p) = Picture (map (scalePic s) p)
+
+scaleAndMoveHorizontal :: Float -> Float -> Picture -> Picture
+scaleAndMoveHorizontal scaleFactor movement = movePic (movement, 0) . scalePic scaleFactor
+
+randomNumbers :: (Float, Float) -> Int -> IO [Float]
+randomNumbers range nr = take nr . randomRs range <$> getStdGen
+
+randomHouses :: Int -> IO Picture
+randomHouses nr = do
+    someNumbers <- randomNumbers (0.25, 4.0) nr
+    return $ Picture $ snd $ mapAccumR (\mov scal -> (mov+scal, scaleAndMoveHorizontal scal mov houseWithRoofWindow)) 0.0 someNumbers
+
+createSvg :: String -> Int -> IO ()
+createSvg filename nrOfHouses = do
+    houses <- randomHouses nrOfHouses
+    renderToFile filename (toSvgWithHeader (120 * fromIntegral nrOfHouses) 500 $ scalePic 50 houses)

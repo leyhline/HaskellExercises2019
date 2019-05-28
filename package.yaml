@@ -18,6 +18,7 @@ library:
   dependencies:
   - QuickCheck
   - text
+  - random
   - svg-builder
 
 executables:
@@ -30,7 +31,6 @@ executables:
     - -with-rtsopts=-N
     dependencies:
     - Exercises
-    - svg-builder
 
 tests:
   Exercises-test:
