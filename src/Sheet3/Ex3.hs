@@ -88,13 +88,17 @@ dragon i
     | otherwise = newDragon <> formerDragon
     where
         formerDragon = dragon (i-1)
-        c1 = (if even i then x2 else x1) $ head $ getPictureList formerDragon
-        c2 = (if even i then y2 else y1) $ head $ getPictureList formerDragon
-        newDragon = rotatePic (c1, c2) 90 formerDragon
-        
+        c1 = x2 $ head $ getPictureList formerDragon
+        c2 = y2 $ head $ getPictureList formerDragon
+        newDragon = mirrorPic $ rotatePic (c1, c2) 90 formerDragon
 
 getPictureList :: Picture -> [Picture]
 getPictureList (Picture p) = p
 
+mirrorPic :: Picture -> Picture
+mirrorPic (Line x1 y1 x2 y2) = Line x2 y2 x1 y1
+mirrorPic (Picture pics) = Picture (reverse $ map mirrorPic pics)
+mirrorPic x = x
+
 createSvgDragon :: String -> Integer -> IO ()
-createSvgDragon filename i = renderToFile filename (toSvgWithHeader 500 500 $ movePic (100, 100) $ dragon i)
+createSvgDragon filename i = renderToFile filename (toSvgWithHeader 2^(i+2) 2^(i+2) $ movePic (2^i, 2^i) $ dragon i)
