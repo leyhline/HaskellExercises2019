@@ -1,3 +1,5 @@
+*.svg
+
 .stack-work/
 Exercises.cabal
 *~
