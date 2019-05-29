@@ -33,7 +33,11 @@ toSvg (Picture []) = mempty
 toSvg (Picture (p:ps)) = toSvg p <> toSvg (Picture ps)
 
 normalize :: Float -> Float -> Element -> Element
-normalize width height = g_ [Stroke_ <<- T.pack "black", Fill_ <<- T.pack "none", Transform_ <<- rotate 180 <> translate (negate width) (negate height)]
+normalize width height = g_
+    [Stroke_ <<- T.pack "black"
+    ,Fill_ <<- T.pack "none"
+    ,Transform_ <<- rotate 180 <> translate (negate width) (negate height)
+    ,Stroke_width_ <<- T.pack "3"]
 
 toSvgWithHeader :: Float -> Float -> Picture -> Element
 toSvgWithHeader canvasWidth canvasHeight pic = doctype <> with (svg11_ (normalize canvasWidth canvasHeight $ toSvg pic)) [attr Width_ canvasWidth, attr Height_ canvasHeight]
