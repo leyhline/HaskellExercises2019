@@ -5,25 +5,37 @@ import Test.QuickCheck.All
 
 foldr' :: (a -> b -> b) -> b -> [a] -> b
 foldr' _ y [] = y
-foldr' f y (x:xs) = foldr' f (f x y) xs
+foldr' f y (x:xs) = f x (foldr' f y xs)
 
-prop_CompareWithBuiltinFoldr :: Int -> [Int] -> Bool
-prop_CompareWithBuiltinFoldr y xs = foldr' (+) y xs == foldr (+) y xs
+prop_CompareWithBuiltinFoldr y xs = foldr' (++) y xs == foldr (++) y xs
 
 or' :: [Bool] -> Bool
-or' = undefined
+or' = foldr' (||) False 
+
+prop_CompareWithBuiltinOr x = or' x == or x
 
 filter' :: (a -> Bool) -> [a] -> [a]
-filter' = undefined
+filter' f = foldr' (\x y -> if f x then x : y else y) []
+
+prop_CompareWithBuiltinFilter x = filter' odd x == filter odd x
 
 map' :: (a -> b) -> [a] -> [b]
-map' = undefined
+map' f = foldr' (\x y -> f x : y) []
 
+addOne x = x + 1
+prop_CompareWithBuiltinMap x = map' addOne x == map addOne x
+
+-- TODO: What?
 foldl' :: (b -> a -> b) -> b -> [a] -> b
-foldl' = undefined
+foldl' f a bs = foldr' (\b g x -> g (f x b)) id bs a
+
+prop_CompareWithBuiltinFoldl y xs = foldl' (++) y xs == foldl (++) y xs
 
 remdups :: Eq a => [a] -> [a]
-remdups = undefined
+remdups = foldr' checkNextElement []
+    where
+        checkNextElement x [] = [x]
+        checkNextElement x (y:ys) = if x == y then x : ys else x : y : ys
 
 return []
 runTests :: IO Bool
