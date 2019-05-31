@@ -6,6 +6,7 @@ import qualified Sheet2.Ex1(runTests)
 import qualified Sheet2.Ex2(runTests)
 import qualified Sheet2.Ex3(runTests)
 import qualified Sheet4.Ex1(runTests)
+import qualified Sheet4.Ex2(runTests)
 
 main :: IO ()
 main = do
@@ -16,7 +17,8 @@ main = do
         -- Sheet2.Ex1.runTests,
         -- Sheet2.Ex2.runTests,
         -- Sheet2.Ex3.runTests,
-        Sheet4.Ex1.runTests]
+        -- Sheet4.Ex1.runTests,
+        Sheet4.Ex2.runTests]
     if good
         then exitSuccess
         else exitFailure
