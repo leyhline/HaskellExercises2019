@@ -26,6 +26,7 @@ addOne x = x + 1
 prop_CompareWithBuiltinMap x = map' addOne x == map addOne x
 
 -- TODO: What?
+-- | From <https://wiki.haskell.org/Foldl_as_foldr>
 foldl' :: (b -> a -> b) -> b -> [a] -> b
 foldl' f a bs = foldr' (\b g x -> g (f x b)) id bs a
 
@@ -36,6 +37,14 @@ remdups = foldr' checkNextElement []
     where
         checkNextElement x [] = [x]
         checkNextElement x (y:ys) = if x == y then x : ys else x : y : ys
+
+remdups' :: Eq a => [a] -> [a]
+remdups' [] = []
+remdups' [x] = [x]
+remdups' (x:y:xs) = if x == y then x : remdups' xs else x : remdups' (y : xs)
+
+prop_RemdupsNaiveVsFold :: [Int] -> Bool
+prop_RemdupsNaiveVsFold x = remdups x == remdups' x
 
 return []
 runTests :: IO Bool
