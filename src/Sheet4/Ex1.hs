@@ -41,7 +41,7 @@ remdups = foldr' checkNextElement []
 remdups' :: Eq a => [a] -> [a]
 remdups' [] = []
 remdups' [x] = [x]
-remdups' (x:y:xs) = if x == y then x : remdups' xs else x : remdups' (y : xs)
+remdups' (x:y:ys) = if x == y then remdups' (y:ys) else x : remdups' (y : ys)
 
 prop_RemdupsNaiveVsFold :: [Int] -> Bool
 prop_RemdupsNaiveVsFold x = remdups x == remdups' x
