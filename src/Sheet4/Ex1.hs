@@ -1,13 +1,15 @@
 {-# LANGUAGE TemplateHaskell #-}
 module Sheet4.Ex1 where
 
+import Test.QuickCheck
 import Test.QuickCheck.All
 
 foldr' :: (a -> b -> b) -> b -> [a] -> b
 foldr' _ y [] = y
 foldr' f y (x:xs) = f x (foldr' f y xs)
 
-prop_CompareWithBuiltinFoldr y xs = foldr' (++) y xs == foldr (++) y xs
+prop_CompareWithBuiltinFoldr :: (Fun (Int, Int) Int) -> Int -> [Int] -> Bool
+prop_CompareWithBuiltinFoldr f y xs = foldr' (applyFun2 f) y xs == foldr (applyFun2 f) y xs
 
 or' :: [Bool] -> Bool
 or' = foldr' (||) False 
