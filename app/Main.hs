@@ -1,8 +1,6 @@
-{-# LANGUAGE OverloadedStrings #-}
-
 module Main where
 
-import Sheet3.Ex3(createSvgHouses)
+import Sheet5.Ex1(mainLoop)
 
 main :: IO ()
-main = createSvgHouses "output.svg" 15
+main = mainLoop
