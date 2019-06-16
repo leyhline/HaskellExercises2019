@@ -5,10 +5,25 @@ import Control.Monad
 
 -- Definitions from lecture:
 
+data Term  = Con Integer | Bin Term Op Term  
+    deriving (Eq, Show)
+           
+data Op = Add | Sub | Mul | Div
+    deriving (Eq, Show)
+
 newtype Parser token result = Parser {runParser :: [token] -> [(result, [token])]}
     
 succeed :: r -> Parser t r
 succeed r = Parser $ \ ts -> [(r, ts)]
+
+satisfy :: (t -> Bool) -> Parser t t
+satisfy p = Parser g
+    where
+        g (t:ts) | p t = [(t, ts)]
+        g _ = []
+
+lit :: Eq t => t -> Parser t t
+lit t = satisfy (== t)
 
 pseq :: Parser t (s -> r) -> Parser t s -> Parser t r
 pseq p1 p2 = Parser $ \ts ->
