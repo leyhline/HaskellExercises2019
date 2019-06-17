@@ -2,9 +2,13 @@ module Sheet5.Ex1 where
 
 import System.IO
 import Data.Char
+import qualified Data.Set as Set
 
 initialGuess = 50 :: Int
 maxNumber = 100 :: Int
+greaterSynonyms = Set.fromList ["greater", "g", "larger", "bigger", ">"]
+smallerSynonyms = Set.fromList ["smaller", "s", "lesser", "<"]
+yesSynonyms = Set.fromList ["yes", "y", "ok", "okay", "right", "correct", "="]
 
 initialInstruction :: IO ()
 initialInstruction = do
@@ -18,19 +22,23 @@ readLowercaseLine :: IO String
 readLowercaseLine = putStr "> " >> hFlush stdout >> getLine >>= \input -> return $ map toLower input
 
 parseResponse :: String -> Maybe Ordering
-parseResponse "greater" = Just GT
-parseResponse "smaller" = Just LT
-parseResponse "yes" = Just EQ
-parseResponse _ = Nothing
+parseResponse s
+    | Set.member s greaterSynonyms = Just GT
+    | Set.member s smallerSynonyms = Just LT
+    | Set.member s yesSynonyms = Just EQ
+    | otherwise = Nothing
 
 getResponse :: Int -> IO (Maybe Ordering)
 getResponse n = askForNumber n >> parseResponse <$> readLowercaseLine
     
-questionLoop :: Maybe Ordering -> Int -> Int -> IO ()
-questionLoop (Just EQ) attempt _ = putStrLn ("I won in " ++ show attempt ++ " attempts!")
-questionLoop (Just GT) attempt number = getResponse (number + (number `div` 2)) >>= \response -> questionLoop response (attempt+1) (number + (number `div` 2))
-questionLoop (Just LT) attempt number = getResponse (number - (number `div` 2)) >>= \response -> questionLoop response (attempt+1) (number - (number `div` 2))
-questionLoop Nothing attempt number = getResponse number >>= \response -> questionLoop response attempt number
+questionLoop :: Maybe Ordering -> Int -> Int -> Int -> IO ()
+questionLoop ord attempt number lastInterval
+    | attempt > 10 = error "Are you sure about your number? I give up!"
+    | ord == Just EQ = putStrLn ("I won in " ++ show attempt ++ " attempts!")
+    | ord == Nothing = getResponse number >>= \response -> questionLoop response attempt number lastInterval
+    | ord == Just GT = getResponse (number+newInterval) >>= \response -> questionLoop response (attempt+1) (number+newInterval) newInterval
+    | ord == Just LT = getResponse (number-newInterval) >>= \response -> questionLoop response (attempt+1) (number-newInterval) newInterval
+    where newInterval = (lastInterval `div` 2) + (lastInterval `mod` 2)
 
 mainLoop :: IO ()
-mainLoop = initialInstruction >> questionLoop Nothing 1 50
+mainLoop = initialInstruction >> questionLoop Nothing 1 50 50
