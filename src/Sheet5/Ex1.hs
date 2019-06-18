@@ -38,7 +38,7 @@ questionLoop ord attempt number lastInterval
     | ord == Nothing = getResponse number >>= \response -> questionLoop response attempt number lastInterval
     | ord == Just GT = getResponse (number+newInterval) >>= \response -> questionLoop response (attempt+1) (number+newInterval) newInterval
     | ord == Just LT = getResponse (number-newInterval) >>= \response -> questionLoop response (attempt+1) (number-newInterval) newInterval
-    where newInterval = (lastInterval `div` 2) + (lastInterval `mod` 2)
+    where newInterval = uncurry (+) (divMod lastInterval 2)
 
 mainLoop :: IO ()
 mainLoop = initialInstruction >> questionLoop Nothing 1 50 50
