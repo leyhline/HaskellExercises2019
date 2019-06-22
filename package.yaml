@@ -1,5 +1,5 @@
 name:                Exercises
-version:             0.5.3
+version:             0.6.1
 github:              "leyhline/HaskellExercises2019"
 author:              "Thomas Leyh"
 maintainer:          "thomas.leyh@mailbox.org"
@@ -21,6 +21,7 @@ library:
   - text
   - random
   - svg-builder
+  - transformers
 
 executables:
   Exercises-exe:
