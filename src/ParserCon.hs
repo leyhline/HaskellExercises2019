@@ -17,6 +17,7 @@ import Control.Monad
 import Data.Function
 import Data.List
 import Data.Maybe
+import Data.Char
 
 -- ^ Execution of a parser
 parse :: Parser t r -> [t] -> Maybe r
@@ -101,3 +102,24 @@ instance MonadPlus (Parser t) where
 lit x = P $ plit x
 satisfy p = P $ psatisfy p
 try p = P $ msatisfy p
+
+pmany :: Parser t r -> Parser t [r]
+pmany p = ((:) <$> p <*> pmany p) <|> pure []
+
+pmany1 :: Parser t r -> Parser t [r]
+pmany1 p = (:) <$> p <*> pmany p
+
+pIntersperse ::
+    Parser t r -> Parser t w -> Parser t [r] 
+pIntersperse pThing pSep =
+    (body <|> return [])
+    where
+      body = (:) <$> pThing <*> pmany p
+      p = pSep *> pThing
+
+pInt :: Parser Char Integer
+pInt = read <$> pmany1 (satisfy isDigit)
+
+pIntList :: Parser Char [Integer]
+pIntList =
+    lit '[' *> pIntersperse pInt (lit ',') <* lit ']'
