@@ -17,6 +17,18 @@ data Exp = Num Integer
   deriving (Show, Eq)
 type Id = String
 
+idToken (TId id) = Just id
+idToken _ = Nothing
+
+numToken (TNum num) = Just num
+numToken _ = Nothing
+
+parseAssign :: Parser Token Program
+parseAssign = do
+    id <- try idToken
+    lit TAsgn
+    num <- try numToken
+    return $ Program [Asgn id (Num num)] 
 
 parseString :: String -> Maybe Program
 parseString s = do
@@ -24,7 +36,7 @@ parseString s = do
   parse parser l
 
 parser :: Parser Token Program
-parser = undefined -- Implement this
+parser = parseAssign
 
 
 -- ^ Lexing
