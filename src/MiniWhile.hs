@@ -23,20 +23,24 @@ idToken _ = Nothing
 numToken (TNum num) = Just num
 numToken _ = Nothing
 
-parseAssign :: Parser Token Program
+parseAssign :: Parser Token Stmt
 parseAssign = do
     id <- try idToken
     lit TAsgn
     num <- try numToken
-    return $ Program [Asgn id (Num num)] 
+    lit TSep
+    return $ Asgn id (Num num)
 
 parseString :: String -> Maybe Program
 parseString s = do
   l <- lexer s
   parse parser l
 
+parseStatements :: Parser Token Stmt
+parseStatements = parseAssign
+
 parser :: Parser Token Program
-parser = parseAssign
+parser = Program <$> many1 parseStatements
 
 
 -- ^ Lexing
