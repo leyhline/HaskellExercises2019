@@ -10,6 +10,7 @@ module ParserCon
   , parse        -- ^ return (Just result) on success
   , parseAll     -- ^ returns the `list of successes' (just applies the underlying RawParser)
   , parseLongest -- ^ returns the longest possible parse (as ParseResult value)
+  , pIntersperse
   ) where
 
 import Control.Applicative

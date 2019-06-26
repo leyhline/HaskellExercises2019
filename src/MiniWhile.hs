@@ -9,47 +9,144 @@ import ParserCon
 data Program = Program [Stmt]
   deriving (Show, Eq)
 data Stmt = Asgn Id Exp
-            -- Add more things here
+          | While Exp [Stmt]
   deriving (Show, Eq)
-data Exp = Num Integer
-         | Var Id
-         -- Add more things here
+data Exp = If Exp Exp Exp
+         | LEq AExp AExp
+         | GTh AExp AExp
+         | Equ AExp AExp
+         | NEq AExp AExp
+         | Not Exp
+         | AExp AExp
+  deriving (Show, Eq)
+data AExp = Num Integer
+          | Var Id
+          | Plus AExp AExp
+          | Minus AExp AExp
+          | Mult AExp AExp
+          | Div AExp AExp
   deriving (Show, Eq)
 type Id = String
-
+ 
 idToken (TId id) = Just id
 idToken _ = Nothing
 
 numToken (TNum num) = Just num
 numToken _ = Nothing
 
+cmpToken (TCmp cmp) = Just cmp
+cmpToken _ = Nothing
+
+opToken (TOp op) = Just op
+opToken _ = Nothing
+
+cmpTokenToConstructor TLEq = LEq
+cmpTokenToConstructor TGTh = GTh
+cmpTokenToConstructor TEq = Equ
+cmpTokenToConstructor TNEq = NEq
+
+opTokenToConstructor TPlus = Plus
+opTokenToConstructor TMinus = Minus
+opTokenToConstructor TMult = Mult
+opTokenToConstructor TDiv = Div
+
+parseIf :: Parser Token Exp
+parseIf = do
+  lit TIf
+  condition <- parseExp
+  lit TThen
+  ifTrue <- parseExp
+  lit TElse
+  ifFalse <- parseExp
+  lit TFi
+  return $ If condition ifTrue ifFalse
+
+parseCmp :: Parser Token Exp
+parseCmp = do
+  lExp <- parseAExp
+  cmp <- try cmpToken
+  rExp <- parseAExp
+  return $ (cmpTokenToConstructor cmp) lExp rExp
+
+parseNot :: Parser Token Exp
+parseNot = do
+  lit TNot
+  nExp <- parseExp
+  return $ Not nExp
+
+parseNum :: Parser Token AExp
+parseNum = do
+  num <- try numToken
+  return $ Num num
+
+parseVar :: Parser Token AExp
+parseVar = do
+  id <- try idToken
+  return $ Var id
+
+parseOp :: Parser Token AExp
+parseOp = do
+  lit LBrack
+  lExp <- parseAExp
+  op <- try opToken
+  rExp <- parseAExp
+  lit RBrack
+  return $ (opTokenToConstructor op) lExp rExp
+
+parseExp :: Parser Token Exp
+parseExp = parseIf
+  <|> parseCmp
+  <|> parseNot
+  <|> (AExp <$> parseAExp)
+
+parseAExp :: Parser Token AExp
+parseAExp = parseNum
+  <|> parseVar
+  <|> parseOp
+
 parseAssign :: Parser Token Stmt
 parseAssign = do
-    id <- try idToken
-    lit TAsgn
-    num <- try numToken
-    lit TSep
-    return $ Asgn id (Num num)
+  id <- try idToken
+  lit TAsgn
+  exp <- parseExp
+  return $ Asgn id exp
+
+parseWhile :: Parser Token Stmt
+parseWhile = do
+  lit TWhile
+  condition <- parseExp
+  lit TDo
+  statements <- parseStatements
+  lit TDone
+  return $ While condition statements
 
 parseString :: String -> Maybe Program
 parseString s = do
   l <- lexer s
   parse parser l
 
-parseStatements :: Parser Token Stmt
-parseStatements = parseAssign
+parseSep :: Parser Token ()
+parseSep = do
+  lit TSep
+  return ()
+
+parseStatement :: Parser Token Stmt
+parseStatement = parseAssign <|> parseWhile
+
+parseStatements :: Parser Token [Stmt]
+parseStatements = pIntersperse parseStatement parseSep
 
 parser :: Parser Token Program
-parser = Program <$> many1 parseStatements
+parser = Program <$> parseStatements
 
 
 -- ^ Lexing
 -- Use this lexer to tokenize the input before parsing
 
-data TOrd = LEq | GTh | Eq | NEq
+data TOrd = TLEq | TGTh | TEq | TNEq
   deriving (Show, Eq)
 
-data TOp = Plus | Minus | Mult | Div
+data TOp = TPlus | TMinus | TMult | TDiv
   deriving (Show, Eq)
 
 data Token = TSep -- ';'
@@ -88,9 +185,9 @@ t_num = TNum . read <$> many1 (satisfy isDigit)
 t_sep = TSep <$ lit ';'
 t_asgn = TAsgn <$ string ": ="
 t_alnum = fmap TId $ (:) <$> satisfy isAlpha <*> many (satisfy isAlphaNum)
-t_cmp = TCmp LEq <$ string "<=" <|> TCmp GTh <$ string ">" <|> TCmp Eq <$ string "==" <|> TCmp NEq <$ string "! ="
+t_cmp = TCmp TLEq <$ string "<=" <|> TCmp TGTh <$ string ">" <|> TCmp TEq <$ string "==" <|> TCmp TNEq <$ string "! ="
 t_brack = LBrack <$ string "(" <|> RBrack <$ string ")"
-t_op = TOp Plus <$ string "+" <|> TOp Minus <$ string "-" <|> TOp Mult <$ string "*" <|> TOp Div <$ string "/"
+t_op = TOp TPlus <$ string "+" <|> TOp TMinus <$ string "-" <|> TOp TMult <$ string "*" <|> TOp TDiv <$ string "/"
 t_keyword = TWhile <$ string "while" <|> TDone <$ string "done" <|> TDo <$ string "do"
   <|> TIf <$ string "if" <|> TThen <$ string "then" <|> TElse <$ string "else"
   <|> TFi <$ string "fi" <|> TNot <$ string "not"
