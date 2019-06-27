@@ -51,16 +51,15 @@ opTokenToConstructor TMult = Mult
 opTokenToConstructor TDiv = Div
 
 parseIf :: Parser Token Exp
-parseIf = do
-  lit TIf
-  condition <- parseExp
-  lit TThen
-  ifTrue <- parseExp
-  lit TElse
-  ifFalse <- parseExp
-  lit TFi
-  return $ If condition ifTrue ifFalse
-
+parseIf = pure If
+  <* lit TIf
+  <*> parseExp
+  <* lit TThen
+  <*> parseExp
+  <* lit TElse
+  <*> parseExp
+  <* lit TFi
+  
 parseCmp :: Parser Token Exp
 parseCmp = do
   lExp <- parseAExp
@@ -69,20 +68,13 @@ parseCmp = do
   return $ (cmpTokenToConstructor cmp) lExp rExp
 
 parseNot :: Parser Token Exp
-parseNot = do
-  lit TNot
-  nExp <- parseExp
-  return $ Not nExp
-
+parseNot = pure Not <* lit TNot <*> parseExp
+  
 parseNum :: Parser Token AExp
-parseNum = do
-  num <- try numToken
-  return $ Num num
+parseNum = Num <$> try numToken
 
 parseVar :: Parser Token AExp
-parseVar = do
-  id <- try idToken
-  return $ Var id
+parseVar = Var <$> try idToken
 
 parseOp :: Parser Token AExp
 parseOp = do
@@ -105,30 +97,18 @@ parseAExp = parseNum
   <|> parseOp
 
 parseAssign :: Parser Token Stmt
-parseAssign = do
-  id <- try idToken
-  lit TAsgn
-  exp <- parseExp
-  return $ Asgn id exp
+parseAssign = pure Asgn <*> try idToken <* lit TAsgn <*> parseExp
 
 parseWhile :: Parser Token Stmt
-parseWhile = do
-  lit TWhile
-  condition <- parseExp
-  lit TDo
-  statements <- parseStatements
-  lit TDone
-  return $ While condition statements
-
+parseWhile = pure While <* lit TWhile <*> parseExp <* lit TDo <*> parseStatements <* lit TDone
+  
 parseString :: String -> Maybe Program
 parseString s = do
   l <- lexer s
   parse parser l
 
 parseSep :: Parser Token ()
-parseSep = do
-  lit TSep
-  return ()
+parseSep = () <$ lit TSep
 
 parseStatement :: Parser Token Stmt
 parseStatement = parseAssign <|> parseWhile
