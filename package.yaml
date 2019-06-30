@@ -23,6 +23,7 @@ library:
   - svg-builder
   - transformers
   - mtl
+  - time
 
 executables:
   Exercises-exe:
